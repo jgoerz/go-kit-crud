@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package pb;
 
-option go_package = "github.com/jgoerz/go-kit-crud/pb";
+option go_package = "github.com/jgoerz/go-kit-crud/pkg/client/pb";
 
 service AddressBook {
   rpc CreateContact(ContactRequest) returns (ContactResponse) {}
