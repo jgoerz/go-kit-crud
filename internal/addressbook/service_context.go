@@ -11,7 +11,6 @@ type contextKey string
 var (
 	ctxKeyTenantID      = contextKey("tenantID")
 	ctxKeyCorrelationID = contextKey("correlationID")
-	ctxKeyBearerToken   = contextKey("bearerToken")
 )
 
 func CtxSetTenantID(ctx context.Context, value int64) context.Context {
