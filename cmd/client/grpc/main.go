@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
@@ -19,13 +20,13 @@ import (
 )
 
 func main() {
-	var (
-		grpcAddr = flag.String("addr", ":3334", "gRPC address")
-	)
+	var grpcAddr string
+
+	flag.StringVar(&grpcAddr, "addr", LookupEnvOrString("ADDRESSBOOK_GRPC_PORT", "3334"), "gRPC address")
 	flag.Parse()
 
 	ctx := context.Background()
-	conn, err := grpc.Dial(*grpcAddr, grpc.WithInsecure(), grpc.WithTimeout(1*time.Second))
+	conn, err := grpc.Dial(":"+grpcAddr, grpc.WithInsecure(), grpc.WithTimeout(1*time.Second))
 	if err != nil {
 		log.Fatalln("gRPC dial:", err)
 	}
@@ -84,6 +85,14 @@ func pop(s []string) (string, []string) {
 		return "", s
 	}
 	return s[0], s[1:]
+}
+
+// https://www.gmarik.info/blog/2019/12-factor-golang-flag-package/
+func LookupEnvOrString(key, defaultVal string) string {
+	if val, ok := os.LookupEnv(key); ok {
+		return val
+	}
+	return defaultVal
 }
 
 func createContact(ctx context.Context, service addressbook.Service,

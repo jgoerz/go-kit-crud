@@ -8,7 +8,7 @@ if [ "${HAS_JQ}x" == "x" ]; then
 	exit 1
 fi   
 
-SERVICE_PORT=3333
+SERVICE_PORT=${ADDRESSBOOK_HTTP_PORT:-3333}
 BASE_PATH="/addressbook/v1"
 
 payload=$(cat <<'EOF'
