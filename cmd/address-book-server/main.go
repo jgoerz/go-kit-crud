@@ -14,7 +14,7 @@ import (
 	"syscall"
 
 	"github.com/jgoerz/go-kit-crud/internal/addressbook"
-	"github.com/jgoerz/go-kit-crud/pb"
+	"github.com/jgoerz/go-kit-crud/pkg/client/pb"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"

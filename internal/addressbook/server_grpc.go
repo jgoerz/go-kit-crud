@@ -4,10 +4,12 @@ import (
 	"context"
 
 	grpctransport "github.com/go-kit/kit/transport/grpc"
-	"github.com/jgoerz/go-kit-crud/pb"
+
+	clientapi "github.com/jgoerz/go-kit-crud/pkg/client/addressbook"
+	"github.com/jgoerz/go-kit-crud/pkg/client/pb"
 )
 
-func NewGRPCServer(ctx context.Context, endpoints Endpoints) pb.AddressBookServer {
+func NewGRPCServer(ctx context.Context, endpoints clientapi.Endpoints) pb.AddressBookServer {
 	return &grpcServer{
 		createContact: grpctransport.NewServer(
 			endpoints.CreateContactEP,
@@ -76,7 +78,7 @@ func (s *grpcServer) DeleteContact(ctx context.Context, r *pb.DeleteContactReque
 // Decode from protobuf to domain object
 func DecodeGRPCContactRequest(ctx context.Context, r any) (any, error) {
 	request := r.(*pb.ContactRequest)
-	return &ContactRequest{
+	return &clientapi.ContactRequest{
 		ID:         request.Id,
 		TenantID:   request.TenantId,
 		FirstName:  request.FirstName,
@@ -90,7 +92,7 @@ func DecodeGRPCContactRequest(ctx context.Context, r any) (any, error) {
 // gRPC server method
 // Encode from domain object to protobuf
 func EncodeGRPCContactResponse(ctx context.Context, r any) (any, error) {
-	resp := r.(*ContactResponse)
+	resp := r.(*clientapi.ContactResponse)
 	return &pb.ContactResponse{
 		Id:         resp.ID,
 		TenantId:   resp.TenantID,
@@ -108,7 +110,7 @@ func EncodeGRPCContactResponse(ctx context.Context, r any) (any, error) {
 // Decode from protobuf to domain object
 func DecodeGRPCReadContactRequest(ctx context.Context, r any) (any, error) {
 	request := r.(*pb.ReadContactRequest)
-	return &ReadContactRequest{
+	return &clientapi.ReadContactRequest{
 		ID: request.Id,
 	}, nil
 }
@@ -117,7 +119,7 @@ func DecodeGRPCReadContactRequest(ctx context.Context, r any) (any, error) {
 // Decode from protobuf to domain object
 func DecodeGRPCDeleteContactRequest(ctx context.Context, r any) (any, error) {
 	request := r.(*pb.DeleteContactRequest)
-	return &DeleteContactRequest{
+	return &clientapi.DeleteContactRequest{
 		ID: request.Id,
 	}, nil
 }

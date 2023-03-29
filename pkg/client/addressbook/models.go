@@ -3,9 +3,6 @@ package addressbook
 // These are primarily models for the HTTP/JSON endpoints.  For protobuf, use
 // pb.
 
-// FIXME These are duplicates of the internal/addressbook/models.go.  Need to
-// FIXME figure out the correct way to fix this.
-
 type ContactRequest struct {
 	ID         int64  `json:"id"`
 	TenantID   int64  `json:"tenant_id"`
@@ -37,7 +34,6 @@ type DeleteContactRequest struct {
 }
 
 // Data is an array of ContactResponse structs
-//
 type StandardPayloadResponse struct {
 	Data          []any                  `json:"data"`
 	NextPageToken int64                  `json:"next_page_token"`

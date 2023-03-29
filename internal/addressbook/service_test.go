@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/jgoerz/go-kit-crud/internal/addressbook"
+	clientapi "github.com/jgoerz/go-kit-crud/pkg/client/addressbook"
 
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -274,20 +275,20 @@ func (s *ServiceTestSuite) TestServiceCreateContact() {
 	assert := assert.New(s.T())
 	var testCases = []struct {
 		name        string
-		given       *addressbook.ContactRequest
-		expected    *addressbook.ContactResponse
+		given       *clientapi.ContactRequest
+		expected    *clientapi.ContactResponse
 		expectedErr error
 	}{
 		{
 			name: "create contact id: 1",
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				TenantID:   111,
 				FirstName:  "firstName-111",
 				LastName:   "lastName-111",
 				Address:    "address-111",
 				SomeSecret: "secret-111",
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         1,
 				TenantID:   111,
 				FirstName:  "firstName-111",
@@ -299,14 +300,14 @@ func (s *ServiceTestSuite) TestServiceCreateContact() {
 		},
 		{
 			name: "create contact id: 2",
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				TenantID:   222,
 				FirstName:  "firstName-222",
 				LastName:   "lastName-222",
 				Address:    "address-222",
 				SomeSecret: "secret-222",
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         2,
 				TenantID:   222,
 				FirstName:  "firstName-222",
@@ -318,7 +319,7 @@ func (s *ServiceTestSuite) TestServiceCreateContact() {
 		},
 		{
 			name: "create contact, ignore ID ",
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				ID:         9999,
 				TenantID:   123,
 				FirstName:  "firstName-123",
@@ -326,7 +327,7 @@ func (s *ServiceTestSuite) TestServiceCreateContact() {
 				Address:    "t123",
 				SomeSecret: "secret-123",
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         3,
 				TenantID:   123,
 				FirstName:  "firstName-123",
@@ -338,32 +339,32 @@ func (s *ServiceTestSuite) TestServiceCreateContact() {
 		},
 		// {
 		// 	name: "create contact, duplicate entry",
-		// 	given: &addressbook.ContactRequest{
+		// 	given: &clientapi.ContactRequest{
 		// 		TenantID:   111,
 		// 		FirstName:  "firstName-111",
 		// 		LastName:   "lastName-111",
 		// 		Address:    "address-111",
 		// 		SomeSecret: "secret-111",
 		// 	},
-		// 	expected:    (*addressbook.ContactResponse)(nil),
+		// 	expected:    (*clientapi.ContactResponse)(nil),
 		// 	expectedErr: addressbook.ErrBadRequest,
 		// },
 		{
 			name: "create contact, negative tenantID",
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				TenantID:   -1,
 				FirstName:  "firstName-111",
 				LastName:   "lastName-111",
 				Address:    "address-111",
 				SomeSecret: "secret-111",
 			},
-			expected:    (*addressbook.ContactResponse)(nil),
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrBadRequest,
 		},
 		{
 			name:        "create contact, input nil",
-			given:       (*addressbook.ContactRequest)(nil),
-			expected:    (*addressbook.ContactResponse)(nil),
+			given:       (*clientapi.ContactRequest)(nil),
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrBadRequest,
 		},
 	}
@@ -386,11 +387,11 @@ func (s *ServiceTestSuite) TestServiceReadContact() {
 	assert := assert.New(s.T())
 
 	var seeds = []struct {
-		given    *addressbook.ContactRequest
-		expected *addressbook.ContactResponse
+		given    *clientapi.ContactRequest
+		expected *clientapi.ContactResponse
 	}{
 		{
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				TenantID:   111,
 				FirstName:  "firstName-111",
 				LastName:   "lastName-111",
@@ -398,7 +399,7 @@ func (s *ServiceTestSuite) TestServiceReadContact() {
 				SomeSecret: "secret-111",
 				Active:     true,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         1,
 				TenantID:   111,
 				FirstName:  "firstName-111",
@@ -409,7 +410,7 @@ func (s *ServiceTestSuite) TestServiceReadContact() {
 			},
 		},
 		{
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				TenantID:   222,
 				FirstName:  "firstName-222",
 				LastName:   "lastName-222",
@@ -417,7 +418,7 @@ func (s *ServiceTestSuite) TestServiceReadContact() {
 				SomeSecret: "secret-222",
 				Active:     true,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         2,
 				TenantID:   222,
 				FirstName:  "firstName-222",
@@ -437,16 +438,16 @@ func (s *ServiceTestSuite) TestServiceReadContact() {
 
 	var testCases = []struct {
 		name        string
-		given       *addressbook.ReadContactRequest
-		expected    *addressbook.ContactResponse
+		given       *clientapi.ReadContactRequest
+		expected    *clientapi.ContactResponse
 		expectedErr error
 	}{
 		{
 			name: "read contact tenant 111",
-			given: &addressbook.ReadContactRequest{
+			given: &clientapi.ReadContactRequest{
 				ID: 1,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         1,
 				TenantID:   111,
 				FirstName:  "firstName-111",
@@ -459,10 +460,10 @@ func (s *ServiceTestSuite) TestServiceReadContact() {
 		},
 		{
 			name: "read contact tenant 222",
-			given: &addressbook.ReadContactRequest{
+			given: &clientapi.ReadContactRequest{
 				ID: 2,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         2,
 				TenantID:   222,
 				FirstName:  "firstName-222",
@@ -475,22 +476,22 @@ func (s *ServiceTestSuite) TestServiceReadContact() {
 		},
 		{
 			name: "read contact non-existent",
-			given: &addressbook.ReadContactRequest{
+			given: &clientapi.ReadContactRequest{
 				ID: 9999,
 			},
-			expected:    (*addressbook.ContactResponse)(nil),
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrNotFound,
 		},
 		{
 			name:        "read contact input is nil",
-			given:       (*addressbook.ReadContactRequest)(nil),
-			expected:    (*addressbook.ContactResponse)(nil),
+			given:       (*clientapi.ReadContactRequest)(nil),
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrBadRequest,
 		},
 		{
 			name:        "read contact tenantID is invalid",
-			given:       &addressbook.ReadContactRequest{ID: 0},
-			expected:    (*addressbook.ContactResponse)(nil),
+			given:       &clientapi.ReadContactRequest{ID: 0},
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrBadRequest,
 		},
 	}
@@ -512,11 +513,11 @@ func (s *ServiceTestSuite) TestServiceUpdateContact() {
 	assert := assert.New(s.T())
 
 	var seeds = []struct {
-		given    *addressbook.ContactRequest
-		expected *addressbook.ContactResponse
+		given    *clientapi.ContactRequest
+		expected *clientapi.ContactResponse
 	}{
 		{
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				TenantID:   111,
 				FirstName:  "firstName-111",
 				LastName:   "lastName-111",
@@ -524,7 +525,7 @@ func (s *ServiceTestSuite) TestServiceUpdateContact() {
 				SomeSecret: "secret-111",
 				Active:     true,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         1,
 				TenantID:   111,
 				FirstName:  "firstName-111",
@@ -535,7 +536,7 @@ func (s *ServiceTestSuite) TestServiceUpdateContact() {
 			},
 		},
 		{
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				TenantID:   222,
 				FirstName:  "firstName-222",
 				LastName:   "lastName-222",
@@ -543,7 +544,7 @@ func (s *ServiceTestSuite) TestServiceUpdateContact() {
 				SomeSecret: "secret-222",
 				Active:     true,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         2,
 				TenantID:   222,
 				FirstName:  "firstName-222",
@@ -563,13 +564,13 @@ func (s *ServiceTestSuite) TestServiceUpdateContact() {
 
 	var testCases = []struct {
 		name        string
-		given       *addressbook.ContactRequest
-		expected    *addressbook.ContactResponse
+		given       *clientapi.ContactRequest
+		expected    *clientapi.ContactResponse
 		expectedErr error
 	}{
 		{
 			name: "update contact tenant 111",
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				ID:         1,
 				TenantID:   111,
 				FirstName:  "firstName-111-updated",
@@ -578,7 +579,7 @@ func (s *ServiceTestSuite) TestServiceUpdateContact() {
 				SomeSecret: "secret-111-updated",
 				Active:     true,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         1,
 				TenantID:   111,
 				FirstName:  "firstName-111-updated",
@@ -591,7 +592,7 @@ func (s *ServiceTestSuite) TestServiceUpdateContact() {
 		},
 		{
 			name: "update contact tenant 222",
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				ID:         2,
 				TenantID:   222,
 				FirstName:  "firstName-222-update",
@@ -600,7 +601,7 @@ func (s *ServiceTestSuite) TestServiceUpdateContact() {
 				SomeSecret: "secret-222-update",
 				Active:     true,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         2,
 				TenantID:   222,
 				FirstName:  "firstName-222-update",
@@ -613,7 +614,7 @@ func (s *ServiceTestSuite) TestServiceUpdateContact() {
 		},
 		{
 			name: "update contact non-existent",
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				ID:         9999,
 				TenantID:   9999,
 				FirstName:  "firstName-222-update",
@@ -622,19 +623,19 @@ func (s *ServiceTestSuite) TestServiceUpdateContact() {
 				SomeSecret: "secret-222-update",
 				Active:     true,
 			},
-			expected:    (*addressbook.ContactResponse)(nil),
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrNotFound,
 		},
 		{
 			name:        "update contact input is nil",
-			given:       (*addressbook.ContactRequest)(nil),
-			expected:    (*addressbook.ContactResponse)(nil),
+			given:       (*clientapi.ContactRequest)(nil),
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrBadRequest,
 		},
 		{
 			name:        "update contact ID is invalid",
-			given:       &addressbook.ContactRequest{ID: 0},
-			expected:    (*addressbook.ContactResponse)(nil),
+			given:       &clientapi.ContactRequest{ID: 0},
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrBadRequest,
 		},
 	}
@@ -656,11 +657,11 @@ func (s *ServiceTestSuite) TestServiceDeleteContact() {
 	assert := assert.New(s.T())
 
 	var seeds = []struct {
-		given    *addressbook.ContactRequest
-		expected *addressbook.ContactResponse
+		given    *clientapi.ContactRequest
+		expected *clientapi.ContactResponse
 	}{
 		{
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				TenantID:   111,
 				FirstName:  "firstName-111",
 				LastName:   "lastName-111",
@@ -668,7 +669,7 @@ func (s *ServiceTestSuite) TestServiceDeleteContact() {
 				SomeSecret: "secret-111",
 				Active:     true,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         1,
 				TenantID:   111,
 				FirstName:  "firstName-111",
@@ -679,7 +680,7 @@ func (s *ServiceTestSuite) TestServiceDeleteContact() {
 			},
 		},
 		{
-			given: &addressbook.ContactRequest{
+			given: &clientapi.ContactRequest{
 				TenantID:   222,
 				FirstName:  "firstName-222",
 				LastName:   "lastName-222",
@@ -687,7 +688,7 @@ func (s *ServiceTestSuite) TestServiceDeleteContact() {
 				SomeSecret: "secret-222",
 				Active:     true,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         2,
 				TenantID:   222,
 				FirstName:  "firstName-222",
@@ -707,16 +708,16 @@ func (s *ServiceTestSuite) TestServiceDeleteContact() {
 
 	var testCases = []struct {
 		name        string
-		given       *addressbook.DeleteContactRequest
-		expected    *addressbook.ContactResponse
+		given       *clientapi.DeleteContactRequest
+		expected    *clientapi.ContactResponse
 		expectedErr error
 	}{
 		{
 			name: "delete contact 1",
-			given: &addressbook.DeleteContactRequest{
+			given: &clientapi.DeleteContactRequest{
 				ID: 1,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         1,
 				TenantID:   111,
 				FirstName:  "firstName-111",
@@ -729,10 +730,10 @@ func (s *ServiceTestSuite) TestServiceDeleteContact() {
 		},
 		{
 			name: "delete contact 2",
-			given: &addressbook.DeleteContactRequest{
+			given: &clientapi.DeleteContactRequest{
 				ID: 2,
 			},
-			expected: &addressbook.ContactResponse{
+			expected: &clientapi.ContactResponse{
 				ID:         2,
 				TenantID:   222,
 				FirstName:  "firstName-222",
@@ -745,22 +746,22 @@ func (s *ServiceTestSuite) TestServiceDeleteContact() {
 		},
 		{
 			name: "delete contact non-existent",
-			given: &addressbook.DeleteContactRequest{
+			given: &clientapi.DeleteContactRequest{
 				ID: 9999,
 			},
-			expected:    (*addressbook.ContactResponse)(nil),
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrNotFound,
 		},
 		{
 			name:        "delete contact input is nil",
-			given:       (*addressbook.DeleteContactRequest)(nil),
-			expected:    (*addressbook.ContactResponse)(nil),
+			given:       (*clientapi.DeleteContactRequest)(nil),
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrBadRequest,
 		},
 		{
 			name:        "delete contact invalid ID",
-			given:       &addressbook.DeleteContactRequest{ID: 0},
-			expected:    (*addressbook.ContactResponse)(nil),
+			given:       &clientapi.DeleteContactRequest{ID: 0},
+			expected:    (*clientapi.ContactResponse)(nil),
 			expectedErr: addressbook.ErrBadRequest,
 		},
 	}
@@ -776,7 +777,7 @@ func (s *ServiceTestSuite) TestServiceDeleteContact() {
 		assert.Equal(tc.expected, contact, tc.name)
 
 		if tc.expected != nil {
-			c, err := s.srv.ReadContact(ctx, &addressbook.ReadContactRequest{ID: tc.given.ID})
+			c, err := s.srv.ReadContact(ctx, &clientapi.ReadContactRequest{ID: tc.given.ID})
 			assert.Nil(c, tc.name)
 			assert.ErrorIs(err, addressbook.ErrNotFound, tc.name)
 		}

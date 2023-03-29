@@ -7,12 +7,14 @@ import (
 	"net/http"
 	"strconv"
 
+	clientapi "github.com/jgoerz/go-kit-crud/pkg/client/addressbook"
+
 	chi "github.com/go-chi/chi/v5"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/rs/zerolog/log"
 )
 
-func NewHTTPServer(ctx context.Context, endpoints Endpoints) http.Handler {
+func NewHTTPServer(ctx context.Context, endpoints clientapi.Endpoints) http.Handler {
 	createContactHandler := httptransport.NewServer(
 		endpoints.CreateContactEP,
 		decodeJSONToContactRequest,
@@ -153,7 +155,7 @@ func deleteContactErrorEncoder(ctx context.Context, err error, w http.ResponseWr
 
 func decodeJSONToContactRequest(ctx context.Context, r *http.Request) (any, error) {
 	log.Info().Msg("decodeContactRequest: Enter")
-	var request ContactRequest
+	var request clientapi.ContactRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		log.Error().Msgf("decodeContactRequest: %v", err)
@@ -175,7 +177,7 @@ func decodeJSONToReadContactRequest(ctx context.Context, r *http.Request) (any, 
 	}
 	log.Debug().Msgf("decodeReadContactRequest: id: '%v'", id)
 
-	request := &ReadContactRequest{
+	request := &clientapi.ReadContactRequest{
 		ID: int64(id),
 	}
 	log.Debug().Msgf("decodeReadContactRequest: request: '%v'", request)
@@ -196,7 +198,7 @@ func decodeJSONToDeleteContactRequest(ctx context.Context, r *http.Request) (any
 	}
 	log.Debug().Msgf("decodeDeleteContactRequest: id: '%v'", id)
 
-	request := &DeleteContactRequest{
+	request := &clientapi.DeleteContactRequest{
 		ID: int64(id),
 	}
 	log.Debug().Msgf("decodeDeleteContactRequest: request: '%v'", request)

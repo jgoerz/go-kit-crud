@@ -2,82 +2,20 @@ package addressbook
 
 import (
 	"context"
-	"fmt"
+
+	clientapi "github.com/jgoerz/go-kit-crud/pkg/client/addressbook"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/rs/zerolog/log"
 )
 
-func MakeEndpoints(srv Service) Endpoints {
-	return Endpoints{
+func MakeEndpoints(srv Service) clientapi.Endpoints {
+	return clientapi.Endpoints{
 		CreateContactEP: makeCreateContactEP(srv),
 		ReadContactEP:   makeReadContactEP(srv),
 		UpdateContactEP: makeUpdateContactEP(srv),
 		DeleteContactEP: makeDeleteContactEP(srv),
 	}
-}
-
-type Endpoints struct {
-	CreateContactEP endpoint.Endpoint
-	ReadContactEP   endpoint.Endpoint
-	UpdateContactEP endpoint.Endpoint
-	DeleteContactEP endpoint.Endpoint
-}
-
-func (e Endpoints) CreateContact(ctx context.Context, requ *ContactRequest) (resp *ContactResponse, err error) {
-	raw, err := e.CreateContactEP(ctx, requ)
-	if err != nil {
-		return nil, err
-	}
-	resp, ok := raw.(*ContactResponse)
-	if !ok {
-		err = fmt.Errorf("failed interface conversion;  expected *ContactResponse, got '%T'", raw)
-		log.Err(err).Msg("")
-		return nil, err
-	}
-	return resp, err
-}
-
-func (e Endpoints) ReadContact(ctx context.Context, requ *ReadContactRequest) (resp *ContactResponse, err error) {
-	raw, err := e.ReadContactEP(ctx, requ)
-	if err != nil {
-		return nil, err
-	}
-	resp, ok := raw.(*ContactResponse)
-	if !ok {
-		err = fmt.Errorf("failed interface conversion;  expected *ContactResponse, got '%T'", raw)
-		log.Err(err).Msg("")
-		return nil, err
-	}
-	return resp, err
-}
-
-func (e Endpoints) UpdateContact(ctx context.Context, requ *ContactRequest) (resp *ContactResponse, err error) {
-	raw, err := e.UpdateContactEP(ctx, requ)
-	if err != nil {
-		return nil, err
-	}
-	resp, ok := raw.(*ContactResponse)
-	if !ok {
-		err = fmt.Errorf("failed interface conversion;  expected *ContactResponse, got '%T'", raw)
-		log.Err(err).Msg("")
-		return nil, err
-	}
-	return resp, err
-}
-
-func (e Endpoints) DeleteContact(ctx context.Context, requ *DeleteContactRequest) (resp *ContactResponse, err error) {
-	raw, err := e.DeleteContactEP(ctx, requ)
-	if err != nil {
-		return nil, err
-	}
-	resp, ok := raw.(*ContactResponse)
-	if !ok {
-		err = fmt.Errorf("failed interface conversion;  expected *ContactResponse, got '%T'", raw)
-		log.Err(err).Msg("")
-		return nil, err
-	}
-	return resp, err
 }
 
 func makeCreateContactEP(srv Service) endpoint.Endpoint {
@@ -87,7 +25,7 @@ func makeCreateContactEP(srv Service) endpoint.Endpoint {
 		// data := []any{}
 		// TODO logger?
 
-		requ := request.(*ContactRequest)
+		requ := request.(*clientapi.ContactRequest)
 		contact, err := srv.CreateContact(ctx, requ)
 		if err != nil {
 			log.Err(err).Msg("")
@@ -107,7 +45,7 @@ func makeReadContactEP(srv Service) endpoint.Endpoint {
 		log := log.With().Str("correlation_id", correlationID).Logger() // Needs to be in a GetLogger method somewhere
 		log.Info().Msg("ReadContact Endpoint: Enter")
 
-		requ := request.(*ReadContactRequest)
+		requ := request.(*clientapi.ReadContactRequest)
 		contact, err := srv.ReadContact(ctx, requ)
 		if err != nil {
 			log.Err(err).Msg("")
@@ -128,7 +66,7 @@ func makeUpdateContactEP(srv Service) endpoint.Endpoint {
 		log.Info().Msg("UpdateContact Endpoint: Enter")
 		// TODO logger?
 
-		requ := request.(*ContactRequest)
+		requ := request.(*clientapi.ContactRequest)
 		contact, err := srv.UpdateContact(ctx, requ)
 		if err != nil {
 			log.Err(err).Msg("")
@@ -149,7 +87,7 @@ func makeDeleteContactEP(srv Service) endpoint.Endpoint {
 		log.Info().Msg("DeleteContact Endpoint: Enter")
 
 		// TODO logger?
-		requ := request.(*DeleteContactRequest)
+		requ := request.(*clientapi.DeleteContactRequest)
 		contact, err := srv.DeleteContact(ctx, requ)
 		if err != nil {
 			log.Err(err).Msg("")

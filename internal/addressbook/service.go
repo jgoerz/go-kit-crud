@@ -10,14 +10,15 @@ import (
 	"fmt"
 	"reflect"
 
+	clientapi "github.com/jgoerz/go-kit-crud/pkg/client/addressbook"
 	"github.com/rs/zerolog/log"
 )
 
 type Service interface {
-	CreateContact(ctx context.Context, input *ContactRequest) (output *ContactResponse, err error)
-	ReadContact(ctx context.Context, input *ReadContactRequest) (output *ContactResponse, err error)
-	UpdateContact(ctx context.Context, input *ContactRequest) (output *ContactResponse, err error)
-	DeleteContact(ctx context.Context, input *DeleteContactRequest) (output *ContactResponse, err error)
+	CreateContact(ctx context.Context, input *clientapi.ContactRequest) (output *clientapi.ContactResponse, err error)
+	ReadContact(ctx context.Context, input *clientapi.ReadContactRequest) (output *clientapi.ContactResponse, err error)
+	UpdateContact(ctx context.Context, input *clientapi.ContactRequest) (output *clientapi.ContactResponse, err error)
+	DeleteContact(ctx context.Context, input *clientapi.DeleteContactRequest) (output *clientapi.ContactResponse, err error)
 }
 
 // Look at https://betterstack.com/community/guides/logging/zerolog/#using-zerolog-in-a-web-application
@@ -43,7 +44,7 @@ var (
 	ErrInternal   = errors.New("internal error")
 )
 
-func (service *addressBook) CreateContact(ctx context.Context, input *ContactRequest) (output *ContactResponse, err error) {
+func (service *addressBook) CreateContact(ctx context.Context, input *clientapi.ContactRequest) (output *clientapi.ContactResponse, err error) {
 	log.Debug().Msgf("Service: CreateContact: obj: %T, %v", input, input)
 
 	// Input validation
@@ -85,7 +86,7 @@ func (service *addressBook) CreateContact(ctx context.Context, input *ContactReq
 	return output, nil
 }
 
-func (service *addressBook) ReadContact(ctx context.Context, input *ReadContactRequest) (output *ContactResponse, err error) {
+func (service *addressBook) ReadContact(ctx context.Context, input *clientapi.ReadContactRequest) (output *clientapi.ContactResponse, err error) {
 	log.Debug().Msgf("Service: ReadContact: input: %v", input)
 
 	// Input validation
@@ -113,7 +114,7 @@ func (service *addressBook) ReadContact(ctx context.Context, input *ReadContactR
 	return output, nil
 }
 
-func (service *addressBook) UpdateContact(ctx context.Context, input *ContactRequest) (output *ContactResponse, err error) {
+func (service *addressBook) UpdateContact(ctx context.Context, input *clientapi.ContactRequest) (output *clientapi.ContactResponse, err error) {
 	log.Debug().Msgf("Service: UpdateContact: input: %T %v", input, input)
 
 	// Input validation
@@ -152,7 +153,7 @@ func (service *addressBook) UpdateContact(ctx context.Context, input *ContactReq
 	return output, nil
 }
 
-func (service *addressBook) DeleteContact(ctx context.Context, input *DeleteContactRequest) (output *ContactResponse, err error) {
+func (service *addressBook) DeleteContact(ctx context.Context, input *clientapi.DeleteContactRequest) (output *clientapi.ContactResponse, err error) {
 	log.Debug().Msgf("Service: DeleteContact: %v", input)
 
 	// Input validation

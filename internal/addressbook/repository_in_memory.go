@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	clientapi "github.com/jgoerz/go-kit-crud/pkg/client/addressbook"
+
 	"github.com/rs/zerolog/log"
 )
 
@@ -23,7 +25,7 @@ type inMemoryRepository struct {
 	nextContactID int64
 }
 
-func (r *inMemoryRepository) CreateContact(ctx context.Context, input *ContactRequest) (output *ContactResponse, err error) {
+func (r *inMemoryRepository) CreateContact(ctx context.Context, input *clientapi.ContactRequest) (output *clientapi.ContactResponse, err error) {
 	log.Debug().Msg("inMemoryRepository: CreateContact: Enter")
 	r.lock.Lock()
 	defer r.lock.Unlock()
@@ -51,7 +53,7 @@ func (r *inMemoryRepository) CreateContact(ctx context.Context, input *ContactRe
 	r.contacts[contact.ID] = contact
 
 	log.Debug().Msg("inMemoryRepository: CreateContact: Exit")
-	return &ContactResponse{
+	return &clientapi.ContactResponse{
 		ID:         contact.ID,
 		TenantID:   contact.TenantID,
 		FirstName:  contact.FirstName,
@@ -64,7 +66,7 @@ func (r *inMemoryRepository) CreateContact(ctx context.Context, input *ContactRe
 	}, nil
 }
 
-func (r *inMemoryRepository) ReadContact(ctx context.Context, input *ReadContactRequest) (output *ContactResponse, err error) {
+func (r *inMemoryRepository) ReadContact(ctx context.Context, input *clientapi.ReadContactRequest) (output *clientapi.ContactResponse, err error) {
 	log.Debug().Msg("inMemoryRepository: ReadContact: Enter")
 	r.lock.RLock()
 	defer r.lock.RUnlock()
@@ -82,7 +84,7 @@ func (r *inMemoryRepository) ReadContact(ctx context.Context, input *ReadContact
 	log.Debug().Msgf("inMemoryRepository: ReadContact: contact: %v", contact)
 
 	log.Debug().Msg("inMemoryRepository: ReadContact: Exit")
-	return &ContactResponse{
+	return &clientapi.ContactResponse{
 		ID:         contact.ID,
 		TenantID:   contact.TenantID,
 		FirstName:  contact.FirstName,
@@ -95,7 +97,7 @@ func (r *inMemoryRepository) ReadContact(ctx context.Context, input *ReadContact
 	}, nil
 }
 
-func (r *inMemoryRepository) UpdateContact(ctx context.Context, input *ContactRequest) (output *ContactResponse, err error) {
+func (r *inMemoryRepository) UpdateContact(ctx context.Context, input *clientapi.ContactRequest) (output *clientapi.ContactResponse, err error) {
 	log.Debug().Msg("inMemoryRepository: UpdateContact: Enter")
 	r.lock.Lock()
 	defer r.lock.Unlock()
@@ -125,7 +127,7 @@ func (r *inMemoryRepository) UpdateContact(ctx context.Context, input *ContactRe
 	r.contacts[input.ID] = updated
 
 	log.Debug().Msg("inMemoryRepository: UpdateContact: Exit")
-	return &ContactResponse{
+	return &clientapi.ContactResponse{
 		ID:         updated.ID,
 		TenantID:   updated.TenantID,
 		FirstName:  updated.FirstName,
@@ -138,7 +140,7 @@ func (r *inMemoryRepository) UpdateContact(ctx context.Context, input *ContactRe
 	}, nil
 }
 
-func (r *inMemoryRepository) DeleteContact(ctx context.Context, input *DeleteContactRequest) (output *ContactResponse, err error) {
+func (r *inMemoryRepository) DeleteContact(ctx context.Context, input *clientapi.DeleteContactRequest) (output *clientapi.ContactResponse, err error) {
 	log.Debug().Msg("inMemoryRepository: DeleteContact: Enter")
 	r.lock.Lock()
 	defer r.lock.Unlock()
@@ -156,7 +158,7 @@ func (r *inMemoryRepository) DeleteContact(ctx context.Context, input *DeleteCon
 	log.Debug().Msgf("inMemoryRepository: DeleteContact: contact: %v", contact)
 
 	log.Debug().Msg("inMemoryRepository: DeleteContact: Exit")
-	return &ContactResponse{
+	return &clientapi.ContactResponse{
 		ID:         contact.ID,
 		TenantID:   contact.TenantID,
 		FirstName:  contact.FirstName,

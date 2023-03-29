@@ -12,7 +12,9 @@ import (
 	"time"
 
 	"github.com/jgoerz/go-kit-crud/internal/addressbook"
+	client "github.com/jgoerz/go-kit-crud/pkg/client/addressbook"
 	grpcclient "github.com/jgoerz/go-kit-crud/pkg/client/grpc"
+
 	"google.golang.org/grpc"
 )
 
@@ -97,7 +99,7 @@ func createContact(ctx context.Context, service addressbook.Service,
 		log.Fatalln(err.Error())
 	}
 
-	input := &addressbook.ContactRequest{
+	input := &client.ContactRequest{
 		TenantID:   tenantID,
 		FirstName:  firstName,
 		LastName:   lastName,
@@ -119,7 +121,7 @@ func readContact(ctx context.Context, service addressbook.Service, rawID string)
 		log.Fatalln(err.Error())
 	}
 
-	input := &addressbook.ReadContactRequest{
+	input := &client.ReadContactRequest{
 		ID: id,
 	}
 
@@ -148,7 +150,7 @@ func updateContact(ctx context.Context, service addressbook.Service,
 		log.Fatalln(err.Error())
 	}
 
-	input := &addressbook.ContactRequest{
+	input := &client.ContactRequest{
 		ID:         id,
 		TenantID:   tenantID,
 		FirstName:  firstName,
@@ -172,7 +174,7 @@ func deleteContact(ctx context.Context, service addressbook.Service, rawID strin
 		log.Fatalln(err.Error())
 	}
 
-	input := &addressbook.DeleteContactRequest{
+	input := &client.DeleteContactRequest{
 		ID: id,
 	}
 

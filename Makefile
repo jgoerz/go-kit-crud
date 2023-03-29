@@ -2,7 +2,7 @@
 
 proto:
 	@ clear && printf "protoc pb/*.proto \n --go_out=. \n --go-grpc_out=. \n --go_opt=paths=source_relative \n --go-grpc_opt=paths=source_relative \n --proto_path=.\n" && \
-		protoc pb/*.proto \
+		protoc pkg/client/pb/*.proto \
 			--go_out=. \
 			--go-grpc_out=. \
 			--go_opt=paths=source_relative \

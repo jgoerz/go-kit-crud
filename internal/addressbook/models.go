@@ -12,34 +12,34 @@ type Contact struct {
 	UpdatedAt  string
 }
 
-type ContactRequest struct {
-	ID         int64  `json:"id"`
-	TenantID   int64  `json:"tenant_id"`
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
-	Active     bool   `json:"active"`
-	Address    string `json:"address"`
-	SomeSecret string `json:"some_secret" encryption:"true"`
-}
-
-type ContactResponse struct {
-	ID         int64  `json:"id"`
-	TenantID   int64  `json:"tenant_id"`
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
-	Active     bool   `json:"active"`
-	Address    string `json:"address"`
-	SomeSecret string `json:"some_secret" encryption:"true"`
-	CreatedAt  string `json:"created_at"`
-	UpdatedAt  string `json:"updated_at"`
-}
-
-type ReadContactRequest struct {
-	ID int64 `json:"id"`
-}
-type DeleteContactRequest struct {
-	ID int64 `json:"id"`
-}
+// type ContactRequest struct {
+// 	ID         int64  `json:"id"`
+// 	TenantID   int64  `json:"tenant_id"`
+// 	FirstName  string `json:"first_name"`
+// 	LastName   string `json:"last_name"`
+// 	Active     bool   `json:"active"`
+// 	Address    string `json:"address"`
+// 	SomeSecret string `json:"some_secret" encryption:"true"`
+// }
+//
+// type ContactResponse struct {
+// 	ID         int64  `json:"id"`
+// 	TenantID   int64  `json:"tenant_id"`
+// 	FirstName  string `json:"first_name"`
+// 	LastName   string `json:"last_name"`
+// 	Active     bool   `json:"active"`
+// 	Address    string `json:"address"`
+// 	SomeSecret string `json:"some_secret" encryption:"true"`
+// 	CreatedAt  string `json:"created_at"`
+// 	UpdatedAt  string `json:"updated_at"`
+// }
+//
+// type ReadContactRequest struct {
+// 	ID int64 `json:"id"`
+// }
+// type DeleteContactRequest struct {
+// 	ID int64 `json:"id"`
+// }
 
 type StandardPayloadResponse struct {
 	Data          []any                  `json:"data"`
