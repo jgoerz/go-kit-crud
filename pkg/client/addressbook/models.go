@@ -25,12 +25,22 @@ type ContactResponse struct {
 	UpdatedAt  string `json:"updated_at"`
 }
 
+type ListContactsResponse struct {
+	ContactResponses []*ContactResponse
+	NextPageToken    int64 `json:"next_page_token"`
+}
+
 type ReadContactRequest struct {
 	ID int64 `json:"id"`
 }
 
 type DeleteContactRequest struct {
 	ID int64 `json:"id"`
+}
+
+type ListContactsRequest struct {
+	PageToken int64 `json:"page_token"`
+	PageSize  int32 `json:"page_size"`
 }
 
 // Data is an array of ContactResponse structs

@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	AddressBook_CreateContact_FullMethodName = "/pb.AddressBook/CreateContact"
 	AddressBook_ReadContact_FullMethodName   = "/pb.AddressBook/ReadContact"
+	AddressBook_ListContacts_FullMethodName  = "/pb.AddressBook/ListContacts"
 	AddressBook_UpdateContact_FullMethodName = "/pb.AddressBook/UpdateContact"
 	AddressBook_DeleteContact_FullMethodName = "/pb.AddressBook/DeleteContact"
 )
@@ -31,6 +32,7 @@ const (
 type AddressBookClient interface {
 	CreateContact(ctx context.Context, in *ContactRequest, opts ...grpc.CallOption) (*ContactResponse, error)
 	ReadContact(ctx context.Context, in *ReadContactRequest, opts ...grpc.CallOption) (*ContactResponse, error)
+	ListContacts(ctx context.Context, in *ListContactsRequest, opts ...grpc.CallOption) (*ListContactsResponse, error)
 	UpdateContact(ctx context.Context, in *ContactRequest, opts ...grpc.CallOption) (*ContactResponse, error)
 	DeleteContact(ctx context.Context, in *DeleteContactRequest, opts ...grpc.CallOption) (*ContactResponse, error)
 }
@@ -61,6 +63,15 @@ func (c *addressBookClient) ReadContact(ctx context.Context, in *ReadContactRequ
 	return out, nil
 }
 
+func (c *addressBookClient) ListContacts(ctx context.Context, in *ListContactsRequest, opts ...grpc.CallOption) (*ListContactsResponse, error) {
+	out := new(ListContactsResponse)
+	err := c.cc.Invoke(ctx, AddressBook_ListContacts_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *addressBookClient) UpdateContact(ctx context.Context, in *ContactRequest, opts ...grpc.CallOption) (*ContactResponse, error) {
 	out := new(ContactResponse)
 	err := c.cc.Invoke(ctx, AddressBook_UpdateContact_FullMethodName, in, out, opts...)
@@ -85,6 +96,7 @@ func (c *addressBookClient) DeleteContact(ctx context.Context, in *DeleteContact
 type AddressBookServer interface {
 	CreateContact(context.Context, *ContactRequest) (*ContactResponse, error)
 	ReadContact(context.Context, *ReadContactRequest) (*ContactResponse, error)
+	ListContacts(context.Context, *ListContactsRequest) (*ListContactsResponse, error)
 	UpdateContact(context.Context, *ContactRequest) (*ContactResponse, error)
 	DeleteContact(context.Context, *DeleteContactRequest) (*ContactResponse, error)
 	mustEmbedUnimplementedAddressBookServer()
@@ -99,6 +111,9 @@ func (UnimplementedAddressBookServer) CreateContact(context.Context, *ContactReq
 }
 func (UnimplementedAddressBookServer) ReadContact(context.Context, *ReadContactRequest) (*ContactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadContact not implemented")
+}
+func (UnimplementedAddressBookServer) ListContacts(context.Context, *ListContactsRequest) (*ListContactsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListContacts not implemented")
 }
 func (UnimplementedAddressBookServer) UpdateContact(context.Context, *ContactRequest) (*ContactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateContact not implemented")
@@ -155,6 +170,24 @@ func _AddressBook_ReadContact_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AddressBook_ListContacts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListContactsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AddressBookServer).ListContacts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AddressBook_ListContacts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AddressBookServer).ListContacts(ctx, req.(*ListContactsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AddressBook_UpdateContact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ContactRequest)
 	if err := dec(in); err != nil {
@@ -205,6 +238,10 @@ var AddressBook_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReadContact",
 			Handler:    _AddressBook_ReadContact_Handler,
+		},
+		{
+			MethodName: "ListContacts",
+			Handler:    _AddressBook_ListContacts_Handler,
 		},
 		{
 			MethodName: "UpdateContact",

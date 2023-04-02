@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -29,6 +30,13 @@ func NewHTTPServer(ctx context.Context, endpoints clientapi.Endpoints) http.Hand
 		httptransport.ServerErrorEncoder(readContactErrorEncoder),
 	)
 
+	listContactsHandler := httptransport.NewServer(
+		endpoints.ListContactsEP,
+		decodeJSONToListContactsRequest,
+		encodeResponseToJSON,
+		httptransport.ServerErrorEncoder(readContactErrorEncoder),
+	)
+
 	updateContactHandler := httptransport.NewServer(
 		endpoints.UpdateContactEP,
 		decodeJSONToContactRequest,
@@ -43,9 +51,11 @@ func NewHTTPServer(ctx context.Context, endpoints clientapi.Endpoints) http.Hand
 		httptransport.ServerErrorEncoder(deleteContactErrorEncoder),
 	)
 
+	// Order matters, first match wins
 	router := chi.NewRouter()
 	router.Method("POST", "/contacts", createContactHandler)
 	router.Method("GET", "/contacts/{id}", readContactHandler)
+	router.Method("GET", "/contacts", listContactsHandler)
 	router.Method("PUT", "/contacts/{id}", updateContactHandler)
 	router.Method("DELETE", "/contacts/{id}", deleteContactHandler)
 
@@ -183,6 +193,56 @@ func decodeJSONToReadContactRequest(ctx context.Context, r *http.Request) (any, 
 	log.Debug().Msgf("decodeReadContactRequest: request: '%v'", request)
 
 	log.Info().Msg("decodeReadContactRequest: Exit")
+	return request, nil
+}
+
+func decodeJSONToListContactsRequest(ctx context.Context, r *http.Request) (any, error) {
+	var (
+		pageToken int64
+		pageSize  int32
+	)
+	log.Info().Msg("decodeListContactsRequest: Enter")
+
+	rawPageToken := r.URL.Query().Get("page_token")
+	if rawPageToken != "" {
+		pToken, err := strconv.Atoi(rawPageToken)
+		if err != nil {
+			log.Err(err).Msg("")
+			msg := fmt.Sprintf("page_token invalid query param, expected integer got '%v'", rawPageToken)
+			log.Error().Msg(msg)
+			return nil, fmt.Errorf(msg+": %w", ErrBadRequest)
+		}
+		if pToken <= 0 {
+			pageToken = math.MaxInt64
+		}
+		log.Debug().Msgf("decodeListContactsRequest: pageToken: '%v'", pageToken)
+	} else {
+		pageToken = math.MaxInt64
+	}
+
+	rawPageSize := r.URL.Query().Get("page_size")
+	if rawPageSize != "" {
+		pSize, err := strconv.Atoi(rawPageSize)
+		if err != nil {
+			msg := fmt.Sprintf("page_size invalid query param, expected integer got '%v'", rawPageSize)
+			log.Error().Msg(msg)
+			return nil, fmt.Errorf(msg+": %w", ErrBadRequest)
+		}
+		if pSize <= 0 || pSize > 10 {
+			pageSize = 10
+		}
+		log.Debug().Msgf("decodeListContactsRequest: pageSize: '%v'", pageSize)
+	} else {
+		pageSize = 10
+	}
+
+	request := &clientapi.ListContactsRequest{
+		PageToken: int64(pageToken),
+		PageSize:  10, // change to constant
+	}
+	log.Debug().Msgf("decodeListContactsRequest: request: '%v'", request)
+
+	log.Info().Msg("decodeListContactsRequest: Exit")
 	return request, nil
 }
 

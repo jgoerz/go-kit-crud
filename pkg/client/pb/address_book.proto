@@ -3,10 +3,12 @@ syntax = "proto3";
 package pb;
 
 option go_package = "github.com/jgoerz/go-kit-crud/pkg/client/pb";
+	
 
 service AddressBook {
   rpc CreateContact(ContactRequest) returns (ContactResponse) {}
   rpc ReadContact(ReadContactRequest) returns (ContactResponse) {}
+  rpc ListContacts(ListContactsRequest) returns (ListContactsResponse) {}
   rpc UpdateContact(ContactRequest) returns (ContactResponse) {}
   rpc DeleteContact(DeleteContactRequest) returns (ContactResponse) {}
 }
@@ -30,6 +32,11 @@ message DeleteContactRequest {
   int64 id = 1;
 }
 
+message ListContactsRequest {
+  int64 page_token = 1;
+  int32 page_size = 2;
+}
+
 message ContactResponse {
   int64 id = 1;
   int64 tenant_id = 2;
@@ -41,4 +48,9 @@ message ContactResponse {
   string created_at = 8;
   string updated_at = 9;
   string error = 10;
+}
+
+message ListContactsResponse {
+  int64 next_page_token = 1;
+  repeated ContactResponse contact_responses = 2;
 }

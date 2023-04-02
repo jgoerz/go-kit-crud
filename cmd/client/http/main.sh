@@ -18,7 +18,19 @@ payload=$(cat <<'EOF'
   "last_name": "doe",
   "active": true,
   "address": "123 Main Street",
-  "some_secret": "secret"
+  "some_secret": "janes-secret"
+}
+EOF
+)
+
+payload2=$(cat <<'EOF'
+{
+  "tenant_id": 123,
+  "first_name": "bob",
+  "last_name": "does",
+  "active": true,
+  "address": "234 Main Street",
+  "some_secret": "bobs-secret"
 }
 EOF
 )
@@ -27,6 +39,12 @@ curl \
   -XPOST \
   -H "Content-Type: application/json" \
   --data "${payload}" \
+  http://localhost:${SERVICE_PORT}${BASE_PATH}/contacts | jq .
+
+curl \
+  -XPOST \
+  -H "Content-Type: application/json" \
+  --data "${payload2}" \
   http://localhost:${SERVICE_PORT}${BASE_PATH}/contacts | jq .
 
 

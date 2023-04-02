@@ -56,6 +56,16 @@ func main() {
 
 		readContact(ctx, service, rawID)
 
+	case "list-contacts":
+		var (
+			rawPageToken string
+			rawPageSize  string
+		)
+		rawPageToken, _ = pop(args)
+		rawPageSize, _ = pop(args)
+
+		listContacts(ctx, service, rawPageToken, rawPageSize)
+
 	case "update-contact":
 		var rawID, rawTenantID, firstName, lastName, rawActive, address, someSecret string
 
@@ -139,6 +149,32 @@ func readContact(ctx context.Context, service addressbook.Service, rawID string)
 		log.Fatalln(err.Error())
 	}
 	fmt.Println(contact)
+}
+
+func listContacts(ctx context.Context, service addressbook.Service, rawPageToken, rawPageSize string) {
+	pageToken, err := strconv.ParseInt(rawPageToken, 10, 64)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	pageSize, err := strconv.ParseInt(rawPageSize, 10, 32)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	input := &client.ListContactsRequest{
+		PageToken: pageToken,
+		PageSize:  int32(pageSize),
+	}
+
+	list, err := service.ListContacts(ctx, input)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	for _, contact := range list.ContactResponses {
+		fmt.Println(contact)
+	}
+	fmt.Println("NextPageToken: ", list.NextPageToken)
 }
 
 func updateContact(ctx context.Context, service addressbook.Service,

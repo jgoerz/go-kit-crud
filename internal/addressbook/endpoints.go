@@ -13,6 +13,7 @@ func MakeEndpoints(srv Service) clientapi.Endpoints {
 	return clientapi.Endpoints{
 		CreateContactEP: makeCreateContactEP(srv),
 		ReadContactEP:   makeReadContactEP(srv),
+		ListContactsEP:  makeListContactsEP(srv),
 		UpdateContactEP: makeUpdateContactEP(srv),
 		DeleteContactEP: makeDeleteContactEP(srv),
 	}
@@ -56,6 +57,27 @@ func makeReadContactEP(srv Service) endpoint.Endpoint {
 
 		log.Info().Msg("ReadContact Endpoint: Exit")
 		return contact, err
+	}
+}
+
+func makeListContactsEP(srv Service) endpoint.Endpoint {
+	return func(ctx context.Context, request any) (any, error) {
+		correlationID := CtxGetCorrelationID(ctx)
+		log := log.With().Str("correlation_id", correlationID).Logger() // Needs to be in a GetLogger method somewhere
+		log.Info().Msg("ListContacts Endpoint: Enter")
+
+		requ := request.(*clientapi.ListContactsRequest)
+		contacts, err := srv.ListContacts(ctx, requ)
+		if err != nil {
+			log.Err(err).Msg("")
+			// https://github.com/go-kit/kit/blob/v0.12.0/transport/http/server.go#L14
+			// Handled by errorHandler and errorEncoder
+			return nil, err
+		}
+		log.Debug().Msgf("ListContacts Endpoint: contacts: %T, %v", contacts, contacts)
+
+		log.Info().Msg("ListContacts Endpoint: Exit")
+		return contacts, err
 	}
 }
 

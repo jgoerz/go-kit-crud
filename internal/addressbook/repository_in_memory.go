@@ -3,6 +3,7 @@ package addressbook
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -95,6 +96,47 @@ func (r *inMemoryRepository) ReadContact(ctx context.Context, input *clientapi.R
 		CreatedAt:  contact.CreatedAt,
 		UpdatedAt:  contact.UpdatedAt,
 	}, nil
+}
+
+func (r *inMemoryRepository) ListContacts(ctx context.Context, input *clientapi.ListContactsRequest) (output *clientapi.ListContactsResponse, err error) {
+	log.Debug().Msg("inMemoryRepository: ListContacts: Enter")
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+
+	if input == nil {
+		return nil, ErrBadRequest
+	}
+	log.Debug().Msgf("inMemoryRepository: ListContacts: input: %v", input)
+	log.Debug().Msgf("inMemoryRepository: ListContacts: total: %v", len(r.contacts))
+
+	output = &clientapi.ListContactsResponse{
+		ContactResponses: []*clientapi.ContactResponse{},
+	}
+
+	var minID int64 = math.MaxInt64
+	for _, contact := range r.contacts {
+		if minID > contact.ID {
+			minID = contact.ID
+		}
+		cr := &clientapi.ContactResponse{
+			ID:         contact.ID,
+			TenantID:   contact.TenantID,
+			FirstName:  contact.FirstName,
+			LastName:   contact.LastName,
+			Active:     contact.Active,
+			Address:    contact.Address,
+			SomeSecret: contact.SomeSecret,
+			CreatedAt:  contact.CreatedAt,
+			UpdatedAt:  contact.UpdatedAt,
+		}
+		output.ContactResponses = append(output.ContactResponses, cr)
+	}
+	output.NextPageToken = minID
+
+	log.Debug().Msgf("inMemoryRepository: ListContacts: NextPageToken: %v", output.NextPageToken)
+	log.Debug().Msgf("inMemoryRepository: ListContacts: ContactResponses: %v", output.ContactResponses)
+	log.Debug().Msg("inMemoryRepository: ListContacts: Exit")
+	return output, nil
 }
 
 func (r *inMemoryRepository) UpdateContact(ctx context.Context, input *clientapi.ContactRequest) (output *clientapi.ContactResponse, err error) {

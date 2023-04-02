@@ -14,9 +14,12 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const ContactMaxPageSize = 10
+
 type Service interface {
 	CreateContact(ctx context.Context, input *clientapi.ContactRequest) (output *clientapi.ContactResponse, err error)
 	ReadContact(ctx context.Context, input *clientapi.ReadContactRequest) (output *clientapi.ContactResponse, err error)
+	ListContacts(ctx context.Context, input *clientapi.ListContactsRequest) (output *clientapi.ListContactsResponse, err error)
 	UpdateContact(ctx context.Context, input *clientapi.ContactRequest) (output *clientapi.ContactResponse, err error)
 	DeleteContact(ctx context.Context, input *clientapi.DeleteContactRequest) (output *clientapi.ContactResponse, err error)
 }
@@ -111,6 +114,44 @@ func (service *addressBook) ReadContact(ctx context.Context, input *clientapi.Re
 	}
 	output = decrypted
 
+	return output, nil
+}
+
+func (service *addressBook) ListContacts(ctx context.Context, input *clientapi.ListContactsRequest) (output *clientapi.ListContactsResponse, err error) {
+	log.Debug().Msgf("Service: ListContacts: input: %v", input)
+
+	output = &clientapi.ListContactsResponse{
+		ContactResponses: []*clientapi.ContactResponse{},
+		NextPageToken:    0,
+	}
+
+	// Input validation
+	if input == nil {
+		return nil, fmt.Errorf("service.ListContacts: no input: %w", ErrBadRequest)
+	}
+
+	if input.PageToken < 0 {
+		input.PageToken = 0
+	}
+	if input.PageSize <= 0 {
+		input.PageSize = ContactMaxPageSize
+	}
+
+	response, err := service.repo.ListContacts(ctx, input)
+	if err != nil {
+		return nil, fmt.Errorf("service.ListContacts: %w", err)
+	}
+	output.NextPageToken = response.NextPageToken
+
+	for _, contact := range response.ContactResponses {
+		decrypted, err := Decrypt(contact, service.privateKey)
+		if err != nil {
+			return nil, fmt.Errorf("service.ListContacts.decrypt: %w", err)
+		}
+		output.ContactResponses = append(output.ContactResponses, decrypted)
+	}
+
+	log.Debug().Msgf("Service: ListContacts: output: %v", output)
 	return output, nil
 }
 

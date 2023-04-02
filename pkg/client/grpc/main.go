@@ -26,6 +26,13 @@ func New(conn *grpc.ClientConn) addressbook.Service {
 		pb.ContactResponse{},
 	).Endpoint()
 
+	var listContacts = grpctransport.NewClient(
+		conn, "pb.AddressBook", "ListContacts",
+		EncodeGRPCListContactsRequest,
+		DecodeGRPCListContactsResponse,
+		pb.ListContactsResponse{},
+	).Endpoint()
+
 	var updateContact = grpctransport.NewClient(
 		conn, "pb.AddressBook", "UpdateContact",
 		EncodeGRPCContactRequest,
@@ -43,6 +50,7 @@ func New(conn *grpc.ClientConn) addressbook.Service {
 	return clientapi.Endpoints{
 		CreateContactEP: createContact,
 		ReadContactEP:   readContact,
+		ListContactsEP:  listContacts,
 		UpdateContactEP: updateContact,
 		DeleteContactEP: deleteContact,
 	}
@@ -86,6 +94,47 @@ func EncodeGRPCReadContactRequest(ctx context.Context, r any) (any, error) {
 	request := r.(*clientapi.ReadContactRequest)
 	return &pb.ReadContactRequest{
 		Id: request.ID,
+	}, nil
+}
+
+// gRPC client method
+// Encode from domain object to protobuf
+func EncodeGRPCListContactsRequest(ctx context.Context, r any) (any, error) {
+	request := r.(*clientapi.ListContactsRequest)
+	return &pb.ListContactsRequest{
+		PageToken: request.PageToken,
+		PageSize:  request.PageSize,
+	}, nil
+}
+
+// gRPC client method
+// Decode from protobuf to domain object
+func DecodeGRPCListContactsResponse(ctx context.Context, r any) (any, error) {
+	response := r.(*pb.ListContactsResponse)
+
+	output := &clientapi.ListContactsResponse{
+		ContactResponses: []*clientapi.ContactResponse{},
+		NextPageToken:    response.NextPageToken,
+	}
+
+	for _, contact := range response.ContactResponses {
+		cr := &clientapi.ContactResponse{
+			ID:         contact.Id,
+			TenantID:   contact.TenantId,
+			FirstName:  contact.FirstName,
+			LastName:   contact.LastName,
+			Active:     contact.Active,
+			Address:    contact.Address,
+			SomeSecret: contact.SomeSecret,
+			CreatedAt:  contact.CreatedAt,
+			UpdatedAt:  contact.UpdatedAt,
+		}
+		output.ContactResponses = append(output.ContactResponses, cr)
+	}
+
+	return &clientapi.ListContactsResponse{
+		ContactResponses: output.ContactResponses,
+		NextPageToken:    output.NextPageToken,
 	}, nil
 }
 

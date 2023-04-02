@@ -21,6 +21,11 @@ func NewGRPCServer(ctx context.Context, endpoints clientapi.Endpoints) pb.Addres
 			DecodeGRPCReadContactRequest,
 			EncodeGRPCContactResponse,
 		),
+		listContacts: grpctransport.NewServer(
+			endpoints.ListContactsEP,
+			DecodeGRPCListContactsRequest,
+			EncodeGRPCListContactsResponse,
+		),
 		updateContact: grpctransport.NewServer(
 			endpoints.UpdateContactEP,
 			DecodeGRPCContactRequest,
@@ -38,6 +43,7 @@ type grpcServer struct {
 	pb.UnimplementedAddressBookServer
 	createContact grpctransport.Handler
 	readContact   grpctransport.Handler
+	listContacts  grpctransport.Handler
 	updateContact grpctransport.Handler
 	deleteContact grpctransport.Handler
 }
@@ -56,6 +62,14 @@ func (s *grpcServer) ReadContact(ctx context.Context, r *pb.ReadContactRequest) 
 		return nil, err
 	}
 	return resp.(*pb.ContactResponse), nil
+}
+
+func (s *grpcServer) ListContacts(ctx context.Context, r *pb.ListContactsRequest) (*pb.ListContactsResponse, error) {
+	_, resp, err := s.listContacts.ServeGRPC(ctx, r)
+	if err != nil {
+		return nil, err
+	}
+	return resp.(*pb.ListContactsResponse), nil
 }
 
 func (s *grpcServer) UpdateContact(ctx context.Context, r *pb.ContactRequest) (*pb.ContactResponse, error) {
@@ -121,5 +135,43 @@ func DecodeGRPCDeleteContactRequest(ctx context.Context, r any) (any, error) {
 	request := r.(*pb.DeleteContactRequest)
 	return &clientapi.DeleteContactRequest{
 		ID: request.Id,
+	}, nil
+}
+
+// gRPC server method
+// Decode from protobuf to domain object
+func DecodeGRPCListContactsRequest(ctx context.Context, r any) (any, error) {
+	request := r.(*pb.ListContactsRequest)
+
+	return &clientapi.ListContactsRequest{
+		PageToken: request.PageToken,
+		PageSize:  request.PageSize,
+	}, nil
+}
+
+// gRPC server method
+// Encode from domain object to protobuf
+func EncodeGRPCListContactsResponse(ctx context.Context, r any) (any, error) {
+	resp := r.(*clientapi.ListContactsResponse)
+
+	contactResponses := []*pb.ContactResponse{}
+	for _, contact := range resp.ContactResponses {
+		cr := &pb.ContactResponse{
+			Id:         contact.ID,
+			TenantId:   contact.TenantID,
+			FirstName:  contact.FirstName,
+			LastName:   contact.LastName,
+			Active:     contact.Active,
+			Address:    contact.Address,
+			SomeSecret: contact.SomeSecret,
+			CreatedAt:  contact.CreatedAt,
+			UpdatedAt:  contact.UpdatedAt,
+		}
+		contactResponses = append(contactResponses, cr)
+	}
+
+	return &pb.ListContactsResponse{
+		ContactResponses: contactResponses,
+		NextPageToken:    resp.NextPageToken,
 	}, nil
 }
