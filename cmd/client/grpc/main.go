@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"time"
 
+	// FIXME clients should not be referencing internal implementation
 	"github.com/jgoerz/go-kit-crud/internal/addressbook"
 	client "github.com/jgoerz/go-kit-crud/pkg/client/addressbook"
 	grpcclient "github.com/jgoerz/go-kit-crud/pkg/client/grpc"
